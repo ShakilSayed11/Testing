@@ -16,14 +16,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', async (req, res) => {
-    const { data, error } = await supabase.from('attendance').select('*');
-    if (error) return res.status(500).send('Error fetching data');
-    
-    const currentDate = new Date().toISOString().split('T')[0];
-    const currentDay = `${currentDate.slice(8, 10)}-Jul`;
-    
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/data', async (req, res) => {
+    const { data, error } = await supabase.from('attendance').select('*');
+    if (error) return res.status(500).json({ error: 'Error fetching data' });
+    
+    res.json(data);
 });
 
 app.post('/update', async (req, res) => {
